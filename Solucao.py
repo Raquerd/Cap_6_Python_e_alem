@@ -11,12 +11,13 @@ from time import sleep
 
 oracledb.init_oracle_client(lib_dir=r'C:\Users\Davi\Documents\instantclient-basic-windows.x64-23.7.0.25.01\instantclient_23_7')
 conn = oracledb.connect(user="sys", password="090402", dsn='localhost:1521/XEPDB1', mode=oracledb.SYSDBA)
+cursor = conn.cursor()
 # aaaaa
 df = {'INSUMOS':[], 'CATEGORIA':[], 'FABRICANTE':[], 'VALIDADE':[], 'QTDE_EM_ESTOQUE':[], 'UNIDADE_DE_MEDIDA':[], 'AQUISICAO':[], 'VALOR_UNITARIO':[]}
 print(df)
 def cadastro(dataframe):
-    cursor = conn.cursor()
     cursor.executemany(f'''INSERT INTO INSUMOS_AGRICOLAS (
+                            ID,
                             INSUMO, 
                             CATEGORIA, 
                             FABRICANTE, 
@@ -25,12 +26,14 @@ def cadastro(dataframe):
                             UNIDADE_DE_MEDIDA, 
                             AQUISICAO, 
                             VALOR_UNITARIO)
-                        VALUES(:1, :2, :3, :4, :5, :6, :7, :8)
+                        VALUES(SEQ_CLIENTE.NEXTVAL, :1, :2, :3, :4, :5, :6, :7, :8)
                 ''', list(dataframe.itertuples(index=False, name=None)))
     conn.commit()
-    conn.close()
 
-# def delete():
+def delete():
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM INSUMOS_AGRICOLAS")
+    conn.commit()
 
  
 while True:
@@ -55,11 +58,13 @@ Seleciona a ação que deseja realizar
                         df = json.load(archive)
                     df = pd.DataFrame(df)
                     df.columns = ['INSUMO', 'CATEGORIA', 'FABRICANTE', 'VALIDADE', 'QTDE_EM_ESTOQUE', 'UNIDADE_DE_MEDIDA', 'AQUISICAO', 'VALOR_UNITARIO']
+                    # df['ID'] = df.index
+                    # df = df[['ID','INSUMO', 'CATEGORIA', 'FABRICANTE', 'VALIDADE', 'QTDE_EM_ESTOQUE', 'UNIDADE_DE_MEDIDA', 'AQUISICAO', 'VALOR_UNITARIO']]
                 except:
                     print('Algo não saiu como esperado, tente novamente.')
                 else:
                     print(df)
-                    # cadastro(df)
+
             else:
                 df['INSUMO'] = input("Digite o insumo que deseja inserir: ")
                 df['CATEGORIA'] = input("Digite a categoria do insumo inserido: ")
@@ -81,8 +86,10 @@ Seleciona a ação que deseja realizar
 
             input('Pressione ENTER para prosseguir para o MENU.')
             os.system('cls')
-        
-        case 4:
-            print('tab')
 
-            
+        
+        # case 4:
+            # cursor = conn.cursor()
+            # cursor.execute("DELETE FROM INSUMOS_AGRICOLAS")
+            # conn.commit()
+    # conn.close()
