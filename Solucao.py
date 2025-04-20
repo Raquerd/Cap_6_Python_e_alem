@@ -16,8 +16,7 @@ df = {'INSUMOS':[], 'CATEGORIA':[], 'FABRICANTE':[], 'VALIDADE':[], 'QTDE_EM_EST
 print(df)
 def cadastro(dataframe):
     cursor = conn.cursor()
-    cursor.executemany(f'''INSERT INTO 
-                        INSUMOS_AGRIGOLAS (
+    cursor.executemany(f'''INSERT INTO INSUMOS_AGRICOLAS (
                             INSUMO, 
                             CATEGORIA, 
                             FABRICANTE, 
@@ -27,9 +26,12 @@ def cadastro(dataframe):
                             AQUISICAO, 
                             VALOR_UNITARIO)
                         VALUES(:1, :2, :3, :4, :5, :6, :7, :8)
-                   ''', dataframe.itertuples(index=False, name=None))
+                ''', list(dataframe.itertuples(index=False, name=None)))
     conn.commit()
     conn.close()
+
+# def delete():
+
  
 while True:
     menu_option = int(input(f'''{'-'*15}
@@ -68,21 +70,7 @@ Seleciona a ação que deseja realizar
                 df['AQUISICAO'] = input("Digite a data de aquisição do insumo: ")
                 df['VALOR_UNITARIO'] = float(input("Digite o valor unitário do insumo: "))
 
-            cursor = conn.cursor()
-            cursor.executemany(f'''INSERT INTO 
-                                INSUMOS_AGRIGOLAS (
-                                    INSUMO, 
-                                    CATEGORIA, 
-                                    FABRICANTE, 
-                                    VALIDADE, 
-                                    QTDE_EM_ESTOQUE, 
-                                    UNIDADE_DE_MEDIDA, 
-                                    AQUISICAO, 
-                                    VALOR_UNITARIO)
-                                VALUES(:1, :2, :3, :4, :5, :6, :7, :8)
-                        ''', df.itertuples(index=False, name=None))
-            conn.commit()
-            conn.close()
+            cadastro(df)
  
             input('Pressione ENTER para prosseguir para o MENU.')
             os.system('cls')
@@ -94,6 +82,7 @@ Seleciona a ação que deseja realizar
             input('Pressione ENTER para prosseguir para o MENU.')
             os.system('cls')
         
-        # case 3:
+        case 4:
+            print('tab')
 
             
