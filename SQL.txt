@@ -1,0 +1,23 @@
+create table insumos_agricolas (
+                        id int PRIMARY KEY,
+                        insumo varchar(100), 
+                        categoria varchar(100), 
+                        fabricante varchar(100), 
+                        validade date, 
+                        qtde_em_estoque decimal(10,2), 
+                        unidade_de_medida varchar(20), 
+                        aquisição date, 
+                        valor_unitário decimal(10,2)
+);
+
+CREATE SEQUENCE seq_insumos_id
+START WITH 1
+INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER trg_insumos_id
+BEFORE INSERT ON insumos_agricolas
+FOR EACH ROW
+BEGIN
+    :NEW.id := seq_insumos_id.NEXTVAL;
+END;
+/
