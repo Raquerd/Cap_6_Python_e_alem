@@ -103,43 +103,46 @@ Seleciona a ação que deseja realizar
                     insumos = ''
                     fabricante = ''
                     categoria = ''
-                    sql = 'SELECT * FROM INSUMOS_AGRICOLAS WHERE'
-
+                    sql = 'SELECT * FROM INSUMOS_AGRICOLAS WHERE '
+                    # print(sql[-6:-1])
                     while True:
-                        os.system('cls')
                         ask = int(input('''Quais filtros gostaria de fazer ?\n[1] Filtro de data de valiade\n[2] Filtro de insumos\n[3] Filtro de fabricante\n[4] Filtro de categoria\n\nLEMBRETE: Caso queira refazer algum filtro ja feito, os dados serão sobrepostos\nDigite aqui: '''))
                         match ask:
                             case 1:
                                 data_1 = input('Digite a data de validade inicial: ')
                                 data_2 = input('Digite a data de validade final: ')
-                                sql = sql + f" VALIDADE >= {data_1} and VALIDADE <= {data_2}" if 'and' not in sql else sql + f" and VALIDADE >= {data_1} and VALIDADE <= {data_2}"
+                                sql = sql + f"VALIDADE BETWEEN '{data_1}' and '{data_2}'" if sql[-6:-1] == 'WHERE' else sql + f" and VALIDADE BETWEEN '{data_1}' and '{data_2}'"
                             case 2:
-                                insumos = input('Digite separando cada elemento por "," quais insumos deseja analisar: ').strip()
-                                sql = sql + (" INSUMO in (" + "'" + "', '".join([i for i in insumos.split(',')]) + "')") if 'and' not in sql else sql + (" and INSUMO in (" + "'" + "', '".join([i for i in insumos.split(',')]) + "')")
+                                insumos = input('Digite separando cada elemento por "," sem espaço, quais insumos deseja analisar: ')
+                                sql = sql + ("INSUMO in (" + "'" + "', '".join([i for i in insumos.split(',')]) + "')") if sql[-6:-1] == 'WHERE' else sql + (" and INSUMO in (" + "'" + "', '".join([i for i in insumos.split(',')]) + "')")
                             case 3:
-                                fabricante = pd.read_sql('SELECT DISTINCT FABRICANTE FROM INSUMOS_AGRICOLAS', conn)
-                                # input(f'''Digite separando cada elemento por "," quais fabricantes deseja consultar.\nLista de fabricantes\n{pd.read_sql('SELECT DISTINCT FABRICANTE FROM INSUMOS_AGRICOLAS', conn)}\nDigite aqui:''').strip()
-                                fabricante_list = []
-                                while True:
-                                    fabricante_list.append(fabricante.loc[int(input(f'''Digite o numero referente a qual fabricantes deseja consultar.\nLista de fabricantes\n{fabricante}\nDigite aqui:'''))])
-                                    print(fabricante_list)
-                                    if int(input("Deseja inserir mais algum fabricane na consulta?\n[1] SIM\n[2] NAO\nDigite: ")) == 2:
-                                        break
-                                sql = sql + (" FABRICANTE in (" + "'" + "', '".join([i for i in fabricante_list]) + "')") if 'and' not in sql else sql + (" and FABRICANTE in (" + "'" + "', '".join([i for i in fabricante_list]) + "')")
-                                print(sql)
+                                fabricante = input('Digite separando cada elemento por "," sem espaço, quais fabricantes deseja consultar: ')
+                                sql = sql + ("FABRICANTE in (" + "'" + "', '".join([i for i in fabricante.split(',')]) + "')")  if sql[-6:-1] == 'WHERE' else sql + (" and FABRICANTE in (" + "'" + "', '".join([i for i in fabricante.split(',')]) + "')")
+                                print(fabricante)
                             case 4:
-                                categoria = input('Digite separando cada elemento por "," quais fabricantes deseja consultar: ').strip()
-                                sql = sql + (" CATEGORIA in (" + "'" + "', '".join([i for i in categoria.split(',')]) + "')") if 'and' not in sql else sql + (" and CATEGORIA in (" + "'" + "', '".join([i for i in categoria.split(',')]) + "')")
+                                categoria = input('Digite separando cada elemento por "," sem espaço, quais fabricantes deseja consultar: ')
+                                sql = sql + ("CATEGORIA in (" + "'" + "', '".join([i for i in categoria.split(',')]) + "')") if sql[-6:-1] == 'WHERE' else sql + (" and CATEGORIA in (" + "'" + "', '".join([i for i in categoria.split(',')]) + "')")
                         if int(input('Gostaria de adicionar mais dados\n[1] SIM\n[2] NAO\nDigite: ')) == 2:
                             # os.system('cls')
-                            print(F"INSUMOS: {insumos}\nDATA: {data_1} - {data_2}\nFABRICANTE: {fabricante_list}\nCATEGORIA: {categoria}")
+                            print(F"INSUMOS: {insumos}\nDATA: {data_1} - {data_2}\nFABRICANTE: {fabricante}\nCATEGORIA: {categoria}")
                             break
                 case 2:
                     id_consulta = int(input("Insira o ID do registro que deseja vizualizar: "))
+                    sql = f'SELECT * FROM INSUMOS_AGRICOLAS WHERE ID = {id_consulta}'
+            # print(sql)
+            df_consulta = pd.read_sql(sql, conn)
+            print(df_consulta)
 
-            df_cosulta = pd.read_sql(sql, conn)
-            print(df_cosulta)
-
+            resp = int(input('Deseja extrair os dados?\n[1] SIM\n[2] NAO\nDigite: '))
+            try:
+                if resp == 1:
+                    df_consulta.to_csv(rf'{input("Digite o caminho onde deseja armazenar o arquivo: ")}\{input("Digite um nome para salvar o arquivo: ")}', index=False, sep=';')
+                    break
+                elif resp > 2 or resp <1:
+                    print("Valor digitado invalido")
+                    raise(ValueError)
+            except ValueError as e:
+                print(f'{e} Valor digitado invalido!')
             input('Pressione ENTER para prosseguir para o MENU.')
             os.system('cls')
 
