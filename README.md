@@ -2,6 +2,8 @@
 
 Este repositório armazena a atividade "Cap 6 - Python e além", proposto pela FIAP.
 
+https://github.com/Raquerd/Cap_6_Python_e_alem
+
 ## Proposta
 **Analise e armazenamento de dados de insumos utilizando banco de dados**
 
