@@ -114,17 +114,26 @@ Seleciona a ação que deseja realizar
                     ## Cria uma lista vazia
                     df_list = []
 
+                    ## Bloco de excessão: Valida se os dados inseridos serão corretos
+                    try:
+
                     ## Armazena os dados de cadastro em formato de dicionário
-                    registro = {
-                        'INSUMO': input("Digite o insumo que deseja inserir: "),
-                        'CATEGORIA':input("Digite a categoria do insumo inserido: "),
-                        'FABRICANTE':input("Digite quem é o fabricante deste insumo: "),
-                        'VALIDADE':input("Digite a validade do insumo: "),
-                        'QTDE_EM_ESTOQUE':float(input("Digite a quantidade em estoque deste insumo: ")),
-                        'UNIDADE_DE_MEDIDA':input("Digite qual a unidade de medida adequada para este insumo: "),
-                        'AQUISICAO':input("Digite a data de aquisição do insumo: "),
-                        'VALOR_UNITARIO':float(input("Digite o valor unitário do insumo: "))
-                    }
+                        registro = {
+                            'INSUMO': input("Digite o insumo que deseja inserir: "),
+                            'CATEGORIA':input("Digite a categoria do insumo inserido: "),
+                            'FABRICANTE':input("Digite quem é o fabricante deste insumo: "),
+                            'VALIDADE':input("Digite a validade do insumo: "),
+                            'QTDE_EM_ESTOQUE':float(input("Digite a quantidade em estoque deste insumo: ")),
+                            'UNIDADE_DE_MEDIDA':input("Digite qual a unidade de medida adequada para este insumo: "),
+                            'AQUISICAO':input("Digite a data de aquisição do insumo: "),
+                            'VALOR_UNITARIO':float(input("Digite o valor unitário do insumo: "))
+                        }
+                    except:
+                        print(f'O valor digitado não é valido, tente novamente')
+                        sleep(2)
+                        os.system('cls')
+                        continue
+                
                     os.system('cls')
 
                     ## Adiciona o dicionário dentro de uma lista
@@ -132,6 +141,7 @@ Seleciona a ação que deseja realizar
 
                     ## Transforma a lista em DataFrame
                     df = pd.DataFrame(df_list)
+                    df = df.astype({'INSUMO':str, 'CATEGORIA':str, 'FABRICANTE':str, 'VALIDADE':str, 'QTDE_EM_ESTOQUE':float, 'UNIDADE_DE_MEDIDA':str, 'AQUISICAO':str, 'VALOR_UNITARIO':float})
 
                     ## Captura a resposta do usuario
                     resp = float(input('Gostaria de inserir mais dados ?:\n[1] SIM\n[2] NAO\nDigite: '))
