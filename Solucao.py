@@ -35,8 +35,47 @@ def delete():
     cursor.execute("DELETE FROM INSUMOS_AGRICOLAS")
     conn.commit()
 
+def update_insumo(row):
+    cursor.execute('''
+        UPDATE INSUMOS_AGRICOLAS 
+        SET INSUMO = :2, 
+            CATEGORIA = :3, 
+            FABRICANTE = :4, 
+            VALIDADE = :5, 
+            QTDE_EM_ESTOQUE = :6, 
+            UNIDADE_DE_MEDIDA = :7, 
+            AQUISICAO = :8, 
+            VALOR_UNITARIO = :9 
+        WHERE ID = :1
+    ''', (
+        int(row.ID),
+        str(row.INSUMO),
+        str(row.CATEGORIA),
+        str(row.FABRICANTE),
+        str(row.VALIDADE),
+        float(row.QTDE_EM_ESTOQUE),
+        str(row.UNIDADE_DE_MEDIDA),
+        str(row.AQUISICAO),
+        float(row.VALOR_UNITARIO)
+    ))
+    conn.commit()
+
+def registros():
+    df_list = []
+    registro = {
+        'INSUMO': input("Digite o insumo que deseja inserir: "),
+        'CATEGORIA':input("Digite a categoria do insumo inserido: "),
+        'FABRICANTE':input("Digite quem é o fabricante deste insumo: "),
+        'VALIDADE':input("Digite a validade do insumo: "),
+        'QTDE_EM_ESTOQUE':float(input("Digite a quantidade em estoque deste insumo: ")),
+        'UNIDADE_DE_MEDIDA':input("Digite qual a unidade de medida adequada para este insumo: "),
+        'AQUISICAO':input("Digite a data de aquisição do insumo: "),
+        'VALOR_UNITARIO':float(input("Digite o valor unitário do insumo: "))
+    }
+    return df_list.append(registro)
  
 while True:
+    os.system('cls')
     df_list = []
     menu_option = int(input(f'''{'-'*15}
 Seleciona a ação que deseja realizar
@@ -73,21 +112,10 @@ Seleciona a ação que deseja realizar
 
             elif condition == 2:
                 while True:
-                    registro = {
-                        'INSUMO': input("Digite o insumo que deseja inserir: "),
-                        'CATEGORIA':input("Digite a categoria do insumo inserido: "),
-                        'FABRICANTE':input("Digite quem é o fabricante deste insumo: "),
-                        'VALIDADE':input("Digite a validade do insumo: "),
-                        'QTDE_EM_ESTOQUE':float(input("Digite a quantidade em estoque deste insumo: ")),
-                        'UNIDADE_DE_MEDIDA':input("Digite qual a unidade de medida adequada para este insumo: "),
-                        'AQUISICAO':input("Digite a data de aquisição do insumo: "),
-                        'VALOR_UNITARIO':float(input("Digite o valor unitário do insumo: "))
-                    }
-                    df_list.append(registro)
                     resp = float(input('Gostaria de inserir mais dados ?:\n[1] SIM\n[2] NAO\nDigite: '))
                     if resp == 2:
                         break
-                df = pd.DataFrame(df_list)
+                df = pd.DataFrame(registros)
             cadastro(df, condition)
  
             input('Pressione ENTER para prosseguir para o MENU.')
@@ -98,14 +126,10 @@ Seleciona a ação que deseja realizar
             option = int(input('Qual o tipo de consulta que gostaria de realizar?\n[1] Consulta de registros por lote\n[2] Consulta de registro unico\nDigite aqui: '))
             match option:
                 case 1:
-                    data_1 = ''
-                    data_2 = ''
-                    insumos = ''
-                    fabricante = ''
-                    categoria = ''
                     sql = 'SELECT * FROM INSUMOS_AGRICOLAS WHERE '
                     # print(sql[-6:-1])
                     while True:
+                        os.system('cls')
                         ask = int(input('''Quais filtros gostaria de fazer ?\n[1] Filtro de data de valiade\n[2] Filtro de insumos\n[3] Filtro de fabricante\n[4] Filtro de categoria\n\nLEMBRETE: Caso queira refazer algum filtro ja feito, os dados serão sobrepostos\nDigite aqui: '''))
                         match ask:
                             case 1:
@@ -123,14 +147,22 @@ Seleciona a ação que deseja realizar
                                 categoria = input('Digite separando cada elemento por "," sem espaço, quais fabricantes deseja consultar: ')
                                 sql = sql + ("CATEGORIA in (" + "'" + "', '".join([i for i in categoria.split(',')]) + "')") if sql[-6:-1] == 'WHERE' else sql + (" and CATEGORIA in (" + "'" + "', '".join([i for i in categoria.split(',')]) + "')")
                         if int(input('Gostaria de adicionar mais dados\n[1] SIM\n[2] NAO\nDigite: ')) == 2:
-                            # os.system('cls')
+                            os.system('cls')
                             print(F"INSUMOS: {insumos}\nDATA: {data_1} - {data_2}\nFABRICANTE: {fabricante}\nCATEGORIA: {categoria}")
+                            sleep(2)
                             break
                 case 2:
-                    id_consulta = int(input("Insira o ID do registro que deseja vizualizar: "))
-                    sql = f'SELECT * FROM INSUMOS_AGRICOLAS WHERE ID = {id_consulta}'
+                    
+                        id_consulta = int(input("Insira o ID do registro que deseja vizualizar: "))
+                        sql = f'SELECT * FROM INSUMOS_AGRICOLAS WHERE ID = {id_consulta}'
+                    
             # print(sql)
-            df_consulta = pd.read_sql(sql, conn)
+            try:
+                df_consulta = pd.read_sql(sql, conn)
+            except Exception as e:
+                os.system('cls')
+                print('Algo deu errado.\nTente novamente.')
+
             print(df_consulta)
 
             resp = int(input('Deseja extrair os dados?\n[1] SIM\n[2] NAO\nDigite: '))
@@ -139,19 +171,72 @@ Seleciona a ação que deseja realizar
                     df_consulta.to_csv(rf'{input("Digite o caminho onde deseja armazenar o arquivo: ")}\{input("Digite um nome para salvar o arquivo: ")}', index=False, sep=';')
                     break
                 elif resp > 2 or resp <1:
-                    print("Valor digitado invalido")
                     raise(ValueError)
             except ValueError as e:
                 print(f'{e} Valor digitado invalido!')
             input('Pressione ENTER para prosseguir para o MENU.')
             os.system('cls')
-
         
+        case 3:
+            os.system('cls')
+            try:
+                id = int(input('Digite o ID do registro que você deseja alterar: '))
+                df_att = pd.read_sql(f"SELECT * FROM INSUMOS_AGRICOLAS WHERE ID = {id}", conn)
+                if len(df_att) == 0:
+                    raise(ValueError)
+                print(df_att)
+                while True:
+                        os.system('cls')
+                        alteracao = int(input('Digite o dado que deseja fazer alteração\n[0] Insumo\n[1] Categoria\n[2] Fabricante\n[3] Validade\n[4]Quantidade em estoque\n[5] Unidade de medida\n[6] Aquisicao\n[7] Valor unitario\nDigite aqui: '))
+                        option_list = ['INSUMO', 'CATEGORIA', 'FABRICANTE', 'VALIDADE', 'QTDE_EM_ESTOQUE', 'UNIDADE_DE_MEDIDA', 'AQUISICAO', 'VALOR_UNITARIO']
+                        df_att[option_list[alteracao]] = input('Digite o valor que deseja atribuir ao campo: ')
+                        print(df_att)
+                        
+                        resp = int(input('Deseja atualizar mais algum registro?\n[1] SIM\n[2] NAO\nDigite: '))
+                        if resp == 2:
+                            break
+                        if resp > 2 or resp < 1:
+                            raise(TypeError)
+            except Exception as e:
+                os.system('cls')
+                sleep(2)
+                print(e,'Algo deu errado')
+                continue
+            # update_insumo(df_att.iloc[0])
+            
+            INSUMO = df_att['INSUMO'].iloc[0]
+            CATEGORIA = df_att['CATEGORIA'].iloc[0]
+            FABRICANTE = df_att['FABRICANTE'].iloc[0]
+            VALIDADE = df_att['VALIDADE'].iloc[0]
+            QTDE_EM_ESTOQUE = df_att['QTDE_EM_ESTOQUE'].iloc[0]
+            UNIDADE_DE_MEDIDA = df_att['UNIDADE_DE_MEDIDA'].iloc[0]
+            AQUISICAO = df_att['AQUISICAO'].iloc[0]
+            VALOR_UNITARIO = df_att['VALOR_UNITARIO'].iloc[0]
+
+            cursor.execute(f'''
+                UPDATE INSUMOS_AGRICOLAS 
+                SET INSUMO = '{str(INSUMO)}', 
+                    CATEGORIA = '{str(CATEGORIA)}', 
+                    FABRICANTE = '{str(FABRICANTE)}', 
+                    VALIDADE = '{str(VALIDADE)}', 
+                    QTDE_EM_ESTOQUE = {float(QTDE_EM_ESTOQUE)}, 
+                    UNIDADE_DE_MEDIDA = '{str(UNIDADE_DE_MEDIDA)}', 
+                    AQUISICAO = '{str(AQUISICAO)}', 
+                    VALOR_UNITARIO = {float(VALOR_UNITARIO)}
+                WHERE ID = {int(id)}
+            ''')
+            conn.commit()
+            
         case 4:
             os.system('cls')
             id = int(input("Digite o ID do insumo que deseja eliminar do banco de dados: "))
             cursor = conn.cursor()
-            cursor.execute(F"DELETE FROM INSUMOS_AGRICOLAS WHERE ID = {id}")
+
+            try:
+                cursor.execute(F"DELETE FROM INSUMOS_AGRICOLAS WHERE ID = {id}")
+            except Exception as e:
+                print(f'{e} O ID indicado não existe.')
+
             conn.commit()
             os.system('cls')
 
