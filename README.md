@@ -26,6 +26,8 @@ Por motivos desconhecido, durante o desenvolvimento da opção de atualização 
 
 Esse problema persistiu por algumas horas, mas foi resolvida apenas no momento em que decidimos reiniciar minha maquina, o que resolveu todo o problema.
 
+OBS: DDL da tabela criada presente na pasta de documentos.
+
 ### Diferenciais
 - Opção de consulta em lote ou registro unico.
 - Opção de extração de dados de consulta, o que possibilita analise com ferramentas externas.
